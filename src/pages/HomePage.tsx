@@ -1,24 +1,21 @@
-import { Button } from "@/components/ui/button";
+import { categories } from "@/data/categories";
+import { products } from "@/data/products";
+import { formatPrice } from "@/lib/format";
 
 export function HomePage() {
   return (
-    <div className="space-y-8">
-      <div className="space-y-3">
-        <p className="text-sm font-medium tracking-widest text-brand uppercase">
-          New season
-        </p>
-        <h1 className="text-5xl font-semibold tracking-tight">
-          Quiet clothes for everyday life
-        </h1>
-        <p className="max-w-xl text-muted-foreground">
-          Timeless pieces, made to last. This is a temporary design preview.
-        </p>
-      </div>
-      <div className="flex gap-3">
-        <Button>Shop now</Button>
-        <Button variant="secondary">Learn more</Button>
-        <Button variant="outline">Outline</Button>
-      </div>
+    <div className="space-y-6">
+      <h1 className="text-3xl font-semibold">Mock data test</h1>
+      <p className="text-muted-foreground">
+        {categories.length} categories, {products.length} products
+      </p>
+      <ul className="space-y-1">
+        {products.map((product) => (
+          <li key={product.id}>
+            {product.name} — {formatPrice(product.price)}
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
