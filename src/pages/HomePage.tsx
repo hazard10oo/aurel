@@ -1,31 +1,40 @@
 import { useEffect, useState } from "react";
 
-import { formatPrice } from "@/lib/format";
-import { getFeaturedProducts } from "@/services/productsService";
+import { ProductCard } from "@/components/common/ProductCard";
+import { getProducts } from "@/services/productsService";
 import type { Product } from "@/types/product";
 
 export function HomePage() {
   const [items, setItems] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const [wishlistIds, setWishlistIds] = useState<string[]>([]);
 
   useEffect(() => {
-    getFeaturedProducts()
+    getProducts()
       .then(setItems)
       .finally(() => setLoading(false));
   }, []);
 
+  function toggleWishlist(product: Product) {
+    setWishlistIds((ids) =>
+      ids.includes(product.id)
+        ? ids.filter((id) => id !== product.id)
+        : [...ids, product.id],
+    );
+  }
+
   if (loading) return <p className="text-muted-foreground">Loading...</p>;
 
   return (
-    <div className="space-y-4">
-      <h1 className="text-3xl font-semibold">Featured products</h1>
-      <ul className="space-y-1">
-        {items.map((product) => (
-          <li key={product.id}>
-            {product.name} — {formatPrice(product.price)}
-          </li>
-        ))}
-      </ul>
+    <div className="grid grid-cols-2 gap-x-4 gap-y-8 md:grid-cols-3 lg:grid-cols-4">
+      {items.map((product) => (
+        <ProductCard
+          key={product.id}
+          product={product}
+          isWishlisted={wishlistIds.includes(product.id)}
+          onToggleWishlist={toggleWishlist}
+        />
+      ))}
     </div>
   );
 }
