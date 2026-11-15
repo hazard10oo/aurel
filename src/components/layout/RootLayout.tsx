@@ -1,5 +1,6 @@
-import { Outlet } from "react-router";
+import { Outlet, ScrollRestoration } from "react-router";
 
+import { Container } from "@/components/layout/Container";
 import { Footer } from "@/components/layout/Footer";
 import { Navbar } from "@/components/layout/Navbar";
 
@@ -7,10 +8,13 @@ export function RootLayout() {
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground">
       <Navbar />
-      <main className="mx-auto w-full max-w-6xl flex-1 px-6 py-10">
-        <Outlet />
+      <main className="flex-1 py-10">
+        <Container>
+          <Outlet />
+        </Container>
       </main>
       <Footer />
+      <ScrollRestoration />
     </div>
   );
 }
