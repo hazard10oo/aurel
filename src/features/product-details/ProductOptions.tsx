@@ -1,13 +1,18 @@
 import { useState } from "react";
 import { Minus, Plus } from "lucide-react";
 
+import { useAppDispatch, useAppSelector } from "@/app/hooks";
 import { Button } from "@/components/ui/button";
+import { addItem, getLineId, selectCartItems } from "@/features/cart/cartSlice";
 import { cn } from "@/lib/utils";
 import type { Product, Size } from "@/types/product";
 
 const MAX_QUANTITY = 10;
 
 export function ProductOptions({ product }: { product: Product }) {
+  const dispatch = useAppDispatch();
+  const cartItems = useAppSelector(selectCartItems);
+
   const [colorName, setColorName] = useState(product.colors[0]?.name ?? "");
   const [size, setSize] = useState<Size | null>(
     product.sizes.length === 1 ? product.sizes[0] : null,
@@ -30,8 +35,31 @@ export function ProductOptions({ product }: { product: Product }) {
       setError("Please select a size.");
       return;
     }
-    setError(null);
 
+    const lineId = getLineId(product.id, colorName, size);
+    const inCart =
+      cartItems.find((item) => item.lineId === lineId)?.quantity ?? 0;
+
+    if (inCart >= maxQuantity) {
+      setAdded(false);
+      setError("You already have the maximum available quantity in your cart.");
+      return;
+    }
+
+    dispatch(
+      addItem({
+        productId: product.id,
+        slug: product.slug,
+        name: product.name,
+        image: product.images[0],
+        price: product.price,
+        colorName,
+        size,
+        quantity,
+        maxQuantity,
+      }),
+    );
+    setError(null);
     setAdded(true);
   }
 
@@ -141,7 +169,7 @@ export function ProductOptions({ product }: { product: Product }) {
         )}
         {added && (
           <p role="status" className="text-sm text-brand">
-            Added to cart (demo, the real cart arrives in the next phase).
+            Added to cart.
           </p>
         )}
       </div>

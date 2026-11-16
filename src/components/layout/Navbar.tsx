@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Heart, Menu, Search, ShoppingBag } from "lucide-react";
 import { Link, NavLink } from "react-router";
 import { Container } from "@/components/layout/Container";
+import { useAppSelector } from "@/app/hooks";
+import { selectCartCount } from "@/features/cart/cartSlice";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -19,8 +21,6 @@ const navLinks = [
   { to: "/about", label: "About" },
 ];
 
-const cartCount = 3;
-
 function navLinkClass({ isActive }: { isActive: boolean }) {
   return cn(
     "text-sm transition-colors hover:text-foreground",
@@ -32,6 +32,7 @@ function navLinkClass({ isActive }: { isActive: boolean }) {
 
 export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const cartCount = useAppSelector(selectCartCount);
 
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur">
@@ -99,7 +100,7 @@ export function Navbar() {
               </Link>
             </Button>
             <Button asChild variant="ghost" size="icon" className="relative">
-              <Link to="/cart" aria-label="Cart">
+              <Link to="/cart" aria-label={`Cart, ${cartCount} items`}>
                 <ShoppingBag />
                 {cartCount > 0 && (
                   <span className="absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-brand px-1 text-[10px] font-medium text-brand-foreground">
