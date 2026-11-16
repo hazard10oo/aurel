@@ -4,6 +4,7 @@ import { RootLayout } from "@/components/layout/RootLayout";
 import { HomePage } from "@/pages/HomePage";
 import { NotFoundPage } from "@/pages/NotFoundPage";
 import { ProductsPage } from "@/pages/ProductsPage";
+import { ProductDetailsPage } from "@/pages/ProductDetailsPage";
 
 export const router = createBrowserRouter([
   {
@@ -12,6 +13,7 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: <HomePage /> },
       { path: "products", element: <ProductsPage /> },
+      { path: "products/:slug", element: <ProductDetailsPage /> },
       { path: "*", element: <NotFoundPage /> },
     ],
   },
