@@ -1,4 +1,5 @@
 import { EmptyState } from "@/components/common/EmptyState";
+import { Pagination } from "@/components/common/Pagination";
 import { ProductCard } from "@/components/common/ProductCard";
 import { ProductCardSkeleton } from "@/components/common/ProductCardSkeleton";
 import { ProductGrid } from "@/components/common/ProductGrid";
@@ -16,7 +17,9 @@ export function ProductsPage() {
     setSearch,
     setCategory,
     setQuickFilter,
+    setPriceRange,
     setSort,
+    setPage,
     clearAll,
   } = useProductFilters();
   const { data, isPending, isError, isFetching, refetch } =
@@ -41,10 +44,13 @@ export function ProductsPage() {
 
       <ProductFiltersBar
         filters={filters}
+        hasActiveFilters={hasActiveFilters}
         onSearch={setSearch}
         onCategoryChange={setCategory}
         onQuickFilterChange={setQuickFilter}
+        onPriceChange={setPriceRange}
         onSortChange={setSort}
+        onClearAll={clearAll}
       />
 
       {isPending && (
@@ -78,13 +84,20 @@ export function ProductsPage() {
       )}
 
       {data && data.items.length > 0 && (
-        <div className={cn("transition-opacity", isFetching && "opacity-60")}>
-          <ProductGrid>
-            {data.items.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </ProductGrid>
-        </div>
+        <>
+          <div className={cn("transition-opacity", isFetching && "opacity-60")}>
+            <ProductGrid>
+              {data.items.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </ProductGrid>
+          </div>
+          <Pagination
+            page={data.page}
+            totalPages={data.totalPages}
+            onPageChange={setPage}
+          />
+        </>
       )}
     </div>
   );

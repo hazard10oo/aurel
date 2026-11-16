@@ -5,22 +5,29 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useCategories } from "@/features/categories/queries";
 import { isSortOption, sortOptions } from "@/features/products/filters";
+import { PriceFilter } from "@/features/products/PriceFilter";
 import type { ProductFilters, QuickFilter, SortOption } from "@/types/product";
 
 interface ProductFiltersBarProps {
   filters: ProductFilters;
+  hasActiveFilters: boolean;
   onSearch: (query: string) => void;
   onCategoryChange: (slug: string) => void;
   onQuickFilterChange: (value: QuickFilter | null) => void;
+  onPriceChange: (min: string, max: string) => void;
   onSortChange: (sort: SortOption) => void;
+  onClearAll: () => void;
 }
 
 export function ProductFiltersBar({
   filters,
+  hasActiveFilters,
   onSearch,
   onCategoryChange,
   onQuickFilterChange,
+  onPriceChange,
   onSortChange,
+  onClearAll,
 }: ProductFiltersBarProps) {
   const { data: categories } = useCategories();
 
@@ -102,6 +109,19 @@ export function ProductFiltersBar({
             {value === "new" ? "New" : "On sale"}
           </Button>
         ))}
+      </div>
+
+      <div className="flex flex-wrap items-center gap-4">
+        <PriceFilter
+          min={filters.minPrice}
+          max={filters.maxPrice}
+          onApply={onPriceChange}
+        />
+        {hasActiveFilters && (
+          <Button variant="ghost" size="sm" onClick={onClearAll}>
+            Clear all
+          </Button>
+        )}
       </div>
     </div>
   );

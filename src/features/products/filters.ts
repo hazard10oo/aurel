@@ -1,6 +1,6 @@
 import type { ProductFilters, QuickFilter, SortOption } from "@/types/product";
 
-export const DEFAULT_PAGE_SIZE = 12;
+export const DEFAULT_PAGE_SIZE = 8;
 
 export const sortOptions: { value: SortOption; label: string }[] = [
   { value: "featured", label: "Featured" },
@@ -31,12 +31,18 @@ export function parseFilters(params: URLSearchParams): ProductFilters {
   const quickFilter = params.get("filter");
   const page = Number(params.get("page"));
 
+  let minPrice = parsePrice(params.get("min"));
+  let maxPrice = parsePrice(params.get("max"));
+  if (minPrice !== null && maxPrice !== null && minPrice > maxPrice) {
+    [minPrice, maxPrice] = [maxPrice, minPrice];
+  }
+
   return {
     search: params.get("q")?.trim() ?? "",
     category: params.get("category") ?? "",
     quickFilter: isQuickFilter(quickFilter) ? quickFilter : null,
-    minPrice: parsePrice(params.get("min")),
-    maxPrice: parsePrice(params.get("max")),
+    minPrice,
+    maxPrice,
     sort: isSortOption(sort) ? sort : "featured",
     page: Number.isInteger(page) && page > 0 ? page : 1,
     pageSize: DEFAULT_PAGE_SIZE,

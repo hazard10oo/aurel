@@ -37,6 +37,7 @@ export function useProductFilters() {
     setCategory: (slug: string) => updateParams({ category: slug }),
     setQuickFilter: (value: QuickFilter | null) =>
       updateParams({ filter: value }),
+    setPriceRange: (min: string, max: string) => updateParams({ min, max }),
     setSort: (sort: SortOption) =>
       updateParams({ sort: sort === "featured" ? null : sort }),
     setPage: (page: number) =>
