@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Minus, Plus } from "lucide-react";
-
+import { Link } from "react-router";
 import { useAppDispatch, useAppSelector } from "@/app/hooks";
 import { Button } from "@/components/ui/button";
 import { addItem, getLineId, selectCartItems } from "@/features/cart/cartSlice";
@@ -169,7 +169,10 @@ export function ProductOptions({ product }: { product: Product }) {
         )}
         {added && (
           <p role="status" className="text-sm text-brand">
-            Added to cart.
+            Added to cart.{" "}
+            <Link to="/cart" className="underline underline-offset-4">
+              View cart
+            </Link>
           </p>
         )}
       </div>

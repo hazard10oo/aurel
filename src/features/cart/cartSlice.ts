@@ -2,13 +2,15 @@ import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 
 import type { RootState } from "@/app/store";
+import { findCoupon, getCouponDiscount } from "@/features/cart/coupons";
 import type { CartItem } from "@/types/cart";
 
-interface CartState {
+export interface CartState {
   items: CartItem[];
+  couponCode: string | null;
 }
 
-const initialState: CartState = { items: [] };
+const initialState: CartState = { items: [], couponCode: null };
 
 export function getLineId(
   productId: string,
@@ -59,14 +61,27 @@ const cartSlice = createSlice({
         item.maxQuantity,
       );
     },
+    applyCoupon(state, action: PayloadAction<string>) {
+      state.couponCode = action.payload;
+    },
+    removeCoupon(state) {
+      state.couponCode = null;
+    },
     clearCart(state) {
       state.items = [];
+      state.couponCode = null;
     },
   },
 });
 
-export const { addItem, removeItem, setQuantity, clearCart } =
-  cartSlice.actions;
+export const {
+  addItem,
+  removeItem,
+  setQuantity,
+  applyCoupon,
+  removeCoupon,
+  clearCart,
+} = cartSlice.actions;
 
 export default cartSlice.reducer;
 
@@ -80,3 +95,14 @@ export const selectCartSubtotal = (state: RootState) =>
     (total, item) => total + item.price * item.quantity,
     0,
   );
+
+export const selectActiveCoupon = (state: RootState) =>
+  findCoupon(state.cart.couponCode ?? "");
+
+export const selectCouponDiscount = (state: RootState) => {
+  const coupon = selectActiveCoupon(state);
+  return coupon ? getCouponDiscount(selectCartSubtotal(state), coupon) : 0;
+};
+
+export const selectCartTotal = (state: RootState) =>
+  selectCartSubtotal(state) - selectCouponDiscount(state);
