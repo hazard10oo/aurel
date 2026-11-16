@@ -31,3 +31,27 @@ export interface Product {
   isFeatured: boolean;
   createdAt: string;
 }
+export type SortOption =
+  "featured" | "newest" | "price-asc" | "price-desc" | "popular";
+
+export type QuickFilter = "new" | "sale";
+
+export interface ProductFilters {
+  search: string;
+  category: string;
+  quickFilter: QuickFilter | null;
+  /** بالـ cents */
+  minPrice: number | null;
+  /** بالـ cents */
+  maxPrice: number | null;
+  sort: SortOption;
+  page: number;
+  pageSize: number;
+}
+
+export interface ProductListResult {
+  items: Product[];
+  total: number;
+  page: number;
+  totalPages: number;
+}

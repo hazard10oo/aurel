@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 
 import {
   getBestSellers,
@@ -7,11 +7,20 @@ import {
   getProductBySlug,
   getProducts,
   getRelatedProducts,
+  queryProducts,
 } from "@/services/productsService";
-import type { Product } from "@/types/product";
+import type { Product, ProductFilters } from "@/types/product";
 
 export function useProducts() {
   return useQuery({ queryKey: ["products"], queryFn: getProducts });
+}
+
+export function useProductList(filters: ProductFilters) {
+  return useQuery({
+    queryKey: ["products", "list", filters],
+    queryFn: () => queryProducts(filters),
+    placeholderData: keepPreviousData,
+  });
 }
 
 export function useFeaturedProducts(limit = 4) {

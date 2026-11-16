@@ -1,6 +1,75 @@
+import { categories } from "@/data/categories";
 import { products } from "@/data/products";
 import { delay } from "@/lib/delay";
-import type { Product } from "@/types/product";
+import { getDiscountPercent } from "@/lib/pricing";
+import type {
+  Product,
+  ProductFilters,
+  ProductListResult,
+  SortOption,
+} from "@/types/product";
+
+const sorters: Record<SortOption, (a: Product, b: Product) => number> = {
+  featured: (a, b) => Number(b.isFeatured) - Number(a.isFeatured),
+  newest: (a, b) => b.createdAt.localeCompare(a.createdAt),
+  "price-asc": (a, b) => a.price - b.price,
+  "price-desc": (a, b) => b.price - a.price,
+  popular: (a, b) => b.reviewCount - a.reviewCount,
+};
+
+export async function queryProducts(
+  filters: ProductFilters,
+): Promise<ProductListResult> {
+  await delay();
+
+  const {
+    search,
+    category,
+    quickFilter,
+    minPrice,
+    maxPrice,
+    sort,
+    page,
+    pageSize,
+  } = filters;
+
+  const term = search.toLowerCase();
+  const categoryId = categories.find((item) => item.slug === category)?.id;
+
+  const filtered = products.filter((product) => {
+    if (
+      term &&
+      !`${product.name} ${product.description}`.toLowerCase().includes(term)
+    ) {
+      return false;
+    }
+    if (category && product.categoryId !== categoryId) return false;
+    if (minPrice !== null && product.price < minPrice) return false;
+    if (maxPrice !== null && product.price > maxPrice) return false;
+    if (quickFilter === "new" && !product.isNew) return false;
+    if (
+      quickFilter === "sale" &&
+      getDiscountPercent(product.price, product.compareAtPrice) === 0
+    ) {
+      return false;
+    }
+    return true;
+  });
+
+  const sorted = filtered.toSorted(sorters[sort]);
+
+  const total = sorted.length;
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+  const currentPage = Math.min(Math.max(page, 1), totalPages);
+  const start = (currentPage - 1) * pageSize;
+
+  return {
+    items: sorted.slice(start, start + pageSize),
+    total,
+    page: currentPage,
+    totalPages,
+  };
+}
 
 export async function getProducts(): Promise<Product[]> {
   await delay();

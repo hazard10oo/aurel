@@ -3,21 +3,49 @@ import { ProductCard } from "@/components/common/ProductCard";
 import { ProductCardSkeleton } from "@/components/common/ProductCardSkeleton";
 import { ProductGrid } from "@/components/common/ProductGrid";
 import { Button } from "@/components/ui/button";
-import { useProducts } from "@/features/products/queries";
+import { useCategories } from "@/features/categories/queries";
+import { ProductFiltersBar } from "@/features/products/ProductFiltersBar";
+import { useProductList } from "@/features/products/queries";
+import { useProductFilters } from "@/features/products/useProductFilters";
+import { cn } from "@/lib/utils";
 
 export function ProductsPage() {
-  const { data: products, isPending, isError, refetch } = useProducts();
+  const {
+    filters,
+    hasActiveFilters,
+    setSearch,
+    setCategory,
+    setQuickFilter,
+    setSort,
+    clearAll,
+  } = useProductFilters();
+  const { data, isPending, isError, isFetching, refetch } =
+    useProductList(filters);
+  const { data: categories } = useCategories();
+
+  const activeCategory = categories?.find(
+    (item) => item.slug === filters.category,
+  );
+  const title = filters.search
+    ? `Results for "${filters.search}"`
+    : (activeCategory?.name ?? "All products");
 
   return (
     <div>
       <header className="mb-8 space-y-1">
-        <h1 className="text-4xl font-semibold tracking-tight">All products</h1>
-        {products && (
-          <p className="text-sm text-muted-foreground">
-            {products.length} items
-          </p>
-        )}
+        <h1 className="text-4xl font-semibold tracking-tight">{title}</h1>
+        <p className="text-sm text-muted-foreground" aria-live="polite">
+          {data ? `${data.total} items` : "\u00A0"}
+        </p>
       </header>
+
+      <ProductFiltersBar
+        filters={filters}
+        onSearch={setSearch}
+        onCategoryChange={setCategory}
+        onQuickFilterChange={setQuickFilter}
+        onSortChange={setSort}
+      />
 
       {isPending && (
         <ProductGrid>
@@ -35,19 +63,28 @@ export function ProductsPage() {
         />
       )}
 
-      {products && products.length === 0 && (
+      {data && data.items.length === 0 && (
         <EmptyState
-          title="No products found"
-          description="Check back soon, new pieces arrive every week."
+          title="No products match your filters"
+          description="Try a different search or remove some filters."
+          action={
+            hasActiveFilters ? (
+              <Button variant="outline" onClick={clearAll}>
+                Clear all filters
+              </Button>
+            ) : undefined
+          }
         />
       )}
 
-      {products && products.length > 0 && (
-        <ProductGrid>
-          {products.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </ProductGrid>
+      {data && data.items.length > 0 && (
+        <div className={cn("transition-opacity", isFetching && "opacity-60")}>
+          <ProductGrid>
+            {data.items.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </ProductGrid>
+        </div>
       )}
     </div>
   );
