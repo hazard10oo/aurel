@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ProductGallery } from "@/features/product-details/ProductGallery";
 import { ProductInfo } from "@/features/product-details/ProductInfo";
+import { ProductOptions } from "@/features/product-details/ProductOptions";
+import { RelatedProducts } from "@/features/product-details/RelatedProducts";
 import { useProduct } from "@/features/products/queries";
 
 function ProductDetailsSkeleton() {
@@ -60,8 +62,12 @@ function ProductDetails({ slug }: { slug: string }) {
       </Link>
       <div className="grid gap-10 md:grid-cols-2">
         <ProductGallery images={product.images} name={product.name} />
-        <ProductInfo product={product} />
+        <div className="space-y-8">
+          <ProductInfo product={product} />
+          <ProductOptions product={product} />
+        </div>
       </div>
+      <RelatedProducts product={product} />
     </div>
   );
 }

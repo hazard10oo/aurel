@@ -18,6 +18,7 @@ export function ProductCard({
   onToggleWishlist,
 }: ProductCardProps) {
   const discount = getDiscountPercent(product.price, product.compareAtPrice);
+  const soldOut = product.stock === 0;
   const [primaryImage, secondaryImage] = product.images;
 
   return (
@@ -28,7 +29,10 @@ export function ProductCard({
             src={primaryImage}
             alt={product.name}
             loading="lazy"
-            className="absolute inset-0 h-full w-full object-cover"
+            className={cn(
+              "absolute inset-0 h-full w-full object-cover",
+              soldOut && "opacity-60",
+            )}
           />
           {secondaryImage && (
             <img
@@ -41,15 +45,23 @@ export function ProductCard({
           )}
 
           <div className="absolute top-3 left-3 flex flex-col items-start gap-1">
-            {product.isNew && (
-              <span className="rounded-sm bg-foreground px-2 py-0.5 text-[10px] font-medium tracking-wider text-background uppercase">
-                New
+            {soldOut ? (
+              <span className="rounded-sm bg-destructive px-2 py-0.5 text-[10px] font-medium tracking-wider text-white uppercase">
+                Sold out
               </span>
-            )}
-            {discount > 0 && (
-              <span className="rounded-sm bg-brand px-2 py-0.5 text-[10px] font-medium tracking-wider text-brand-foreground">
-                -{discount}%
-              </span>
+            ) : (
+              <>
+                {product.isNew && (
+                  <span className="rounded-sm bg-foreground px-2 py-0.5 text-[10px] font-medium tracking-wider text-background uppercase">
+                    New
+                  </span>
+                )}
+                {discount > 0 && (
+                  <span className="rounded-sm bg-brand px-2 py-0.5 text-[10px] font-medium tracking-wider text-brand-foreground">
+                    -{discount}%
+                  </span>
+                )}
+              </>
             )}
           </div>
         </div>
